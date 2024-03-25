@@ -1,0 +1,12 @@
+h1{
+    background-color: aqua;
+    width: 550px;
+    text-align: right;
+    padding-right: 30px;
+}
+a{
+    background: red;
+    width: 550px;
+    display: inline-block;
+    text-align: center;
+}
