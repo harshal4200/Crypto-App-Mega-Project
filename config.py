@@ -14,7 +14,7 @@ class Config:
     DB_NAME = os.getenv("DB_NAME", "crypto_app")
 
     # OpenAI
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+  
 
     # Google OAuth
     GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
