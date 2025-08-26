@@ -16,7 +16,6 @@ from modules.security import hash_password, verify_password
 # from email_service import send_email  # tera existing file
 
 # AI Dependencies
-import openai
 
 # Email dependencies
 import smtplib
