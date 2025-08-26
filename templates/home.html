@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Home | Crypto App{% endblock %}
+{% block content %}
+  <section class="hero p-5 glass card-hover">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <h1 class="display-5 fw-bold mb-3">Multi-Layer Encryption, <span class="text-gradient">Made Beautiful</span></h1>
+        
+        <!-- ✅ Fixed line -->
+        <p class="lead text-theme mb-4">
+          Secure messages using a  <strong>Multi-layered software</strong>.Also
+          Decrypt instantly. Send via email. All wrapped in a delightful, modern UI.
+        </p>
+        
+        <div class="d-flex gap-3">
+          <a href="{{ url_for('signup') }}" class="btn btn-accent btn-lg px-4">Create Account</a>
+          <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg px-4">Log In</a>
+        </div>
+      </div>
+      <div class="col-lg-5 mt-4 mt-lg-0">
+        <div class="p-4 glass card-hover">
+          <h5 class="mb-3">Why choose us?</h5>
+          <ul class="mb-0">
+            <li>Three layers of protection</li>
+            <li>Google login & SMTP email</li>
+            <li>Dark/Light theme toggle</li>
+            <li>MySQL backed, Flask powered</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
