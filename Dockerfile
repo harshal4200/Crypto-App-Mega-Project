@@ -10,5 +10,5 @@ COPY . .
 
 EXPOSE 8000
 
-# Flask ke liye correct command
-CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=8000"]
+# Production ke liye Gunicorn use karein
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "app:app"]
