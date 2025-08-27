@@ -10,5 +10,5 @@ COPY . .
 
 EXPOSE 8000
 
-# Sirf EK CMD use karein - ya toh uvicion ya fir gunicorn
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Flask ke liye correct command
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=8000"]
