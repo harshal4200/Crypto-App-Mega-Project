@@ -11,4 +11,4 @@ COPY . .
 EXPOSE 8000
 
 # Sirf EK CMD use karein - ya toh uvicion ya fir gunicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
