@@ -16,7 +16,6 @@ from modules.security import hash_password, verify_password
 # from email_service import send_email  # tera existing file
 
 # AI Dependencies
-import openai
 
 # Email dependencies
 import smtplib
@@ -44,7 +43,7 @@ app.secret_key = SECRET_KEY
 limiter = Limiter(get_remote_address, app=app, default_limits=["30 per minute"])
 
 # OpenAI client
-openai.api_key = OPENAI_API_KEY
+
 
 # ---------------- LOGIN MANAGER ----------------
 class User(UserMixin):

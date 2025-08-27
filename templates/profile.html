@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Profile | Crypto App{% endblock %}
+@app.route("/")
+def home():
+    me = get_current_user()  # tumhara function ya query jo user info laata ho
+    return render_template("profile.html", me=me)
 
 {% block content %}
 <div class="row g-4">
