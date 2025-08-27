@@ -75,10 +75,17 @@ google = oauth.register(
     client_kwargs={"scope": "openid email profile"},
 )
 
-@app.route("/login/google")
+@app.route('/login/google')
 def login_google():
-    redirect_uri = url_for("auth_google_callback", _external=True)
-    return google.authorize_redirect(redirect_uri)
+    try:
+        # Automatic redirect URI - no hardcoding needed
+        redirect_uri = url_for('auth_google_callback', _external=True)
+        print(f"OAuth Redirect: {redirect_uri}")
+        return google.authorize_redirect(redirect_uri)
+    except Exception as e:
+        print(f"Google OAuth Error: {str(e)}")
+        flash("Google login temporarily unavailable", "danger")
+        return redirect(url_for('login'))
 
 @app.route("/auth/google/callback")
 def auth_google_callback():
@@ -109,6 +116,15 @@ def auth_google_callback():
     flash("Logged in with Google!", "success")
     return redirect(url_for("profile"))
 
+
+@app.route('/debug/oauth')
+def debug_oauth():
+    return jsonify({
+        'has_client_id': bool(os.getenv('GOOGLE_CLIENT_ID')),
+        'has_client_secret': bool(os.getenv('GOOGLE_CLIENT_SECRET')),
+        'redirect_uri': url_for('auth_google_callback', _external=True),
+        'current_domain': 'crypto-app-mega-project-production-01ec.up.railway.app'
+    })
 # ---------------- AI CHAT FREE BOT ROUTE (streaming & fallback) ----------------
 @app.route("/crypto-chat", methods=["POST"])
 def crypto_chat():
