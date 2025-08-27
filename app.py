@@ -66,93 +66,48 @@ def load_user(user_id):
     return None
 
 # ---------------- GOOGLE OAUTH ----------------
-# ---------------- GOOGLE OAUTH FIX ----------------
 oauth = OAuth(app)
-
 google = oauth.register(
-    name='google',
-    client_id=os.getenv('GOOGLE_CLIENT_ID'),
-    client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    access_token_params=None,
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-    authorize_params=None,
-    api_base_url='https://www.googleapis.com/oauth2/v1/',
-    client_kwargs={'scope': 'email profile'},
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration'
+    name="google",
+    client_id=Config.GOOGLE_CLIENT_ID,
+    client_secret=Config.GOOGLE_CLIENT_SECRET,
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={"scope": "openid email profile"},
 )
 
-#Debug Route 
-@app.route('/debug/oauth')
-def debug_oauth():
-    return jsonify({
-        'has_client_id': bool(os.getenv('GOOGLE_CLIENT_ID')),
-        'has_client_secret': bool(os.getenv('GOOGLE_CLIENT_SECRET')),
-        'redirect_uri': url_for('auth_google_callback', _external=True),
-        'app_url': 'https://crypto-app-mega-project-production.up.railway.app'
-    })
-
-
-#---------------------------
-@app.route('/login/google')
+@app.route("/login/google")
 def login_google():
-    try:
-        # Debugging ke liye
-        print(f"Client ID: {os.getenv('GOOGLE_CLIENT_ID')}")
-        print(f"Redirect URI: {url_for('auth_google_callback', _external=True)}")
-        
-        redirect_uri = url_for('auth_google_callback', _external=True)
-        return google.authorize_redirect(redirect_uri)
-    except Exception as e:
-        print(f"Google login error: {e}")
-        flash("Google login configuration error", "danger")
-        return redirect(url_for('login'))
+    redirect_uri = url_for("auth_google_callback", _external=True)
+    return google.authorize_redirect(redirect_uri)
 
-@app.route('/auth/google/callback')
+@app.route("/auth/google/callback")
 def auth_google_callback():
-    try:
-        print("Google callback received!")  # Debug
-        token = google.authorize_access_token()
-        
-        if not token:
-            flash("Google login failed: No token received", "danger")
-            return redirect(url_for('login'))
-        
-        # User information get karein
-        user_info = google.get('userinfo').json()
-        print(f"User info: {user_info}")  # Debug
-        
-        email = user_info.get('email')
-        name = user_info.get('name')
-        
-        if not email:
-            flash("Google login failed: No email received", "danger")
-            return redirect(url_for('login'))
-        
-        # Database operations
-        con = get_connection()
-        with con.cursor() as cur:
+    token = google.authorize_access_token()
+    user_info = google.userinfo()
+    
+    if not user_info:
+        flash("Google login failed", "danger")
+        return redirect(url_for("login"))
+
+    email = user_info.get("email")
+    name = user_info.get("name")
+
+    con = get_connection()
+    with con.cursor() as cur:
+        cur.execute("SELECT id, name, email FROM users WHERE email=%s", (email,))
+        row = cur.fetchone()
+        if not row:
+            cur.execute(
+                "INSERT INTO users (name, email, password_hash, gender) VALUES (%s,%s,%s,%s)",
+                (name, email, None, "Not Specified")
+            )
             cur.execute("SELECT id, name, email FROM users WHERE email=%s", (email,))
             row = cur.fetchone()
-            
-            if not row:
-                cur.execute(
-                    "INSERT INTO users (name, email, password_hash, gender) VALUES (%s,%s,%s,%s)",
-                    (name, email, None, "Not Specified")
-                )
-                con.commit()
-                cur.execute("SELECT id, name, email FROM users WHERE email=%s", (email,))
-                row = cur.fetchone()
-        
-        user = User(row["id"], row["name"], row["email"])
-        login_user(user)
-        flash("Logged in with Google successfully!", "success")
-        return redirect(url_for('profile'))
-        
-    except Exception as e:
-        print(f"Google callback error: {e}")
-        flash("Google login failed. Please try again.", "danger")
-        return redirect(url_for('login'))
+
+    user = User(row["id"], row["name"], row["email"])
+    login_user(user)
+    flash("Logged in with Google!", "success")
+    return redirect(url_for("profile"))
 
 # ---------------- AI CHAT FREE BOT ROUTE (streaming & fallback) ----------------
 @app.route("/crypto-chat", methods=["POST"])
@@ -438,4 +393,4 @@ def health():
 
 # ---------------- MAIN ----------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=False)
+    app.run(debug=True)
